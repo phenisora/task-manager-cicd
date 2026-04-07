@@ -11,7 +11,7 @@
 <div class="mb-6 flex space-x-2">
     <a href="{{ route('tasks.index') }}" class="px-4 py-2 bg-white rounded-md text-sm border hover:bg-gray-50">Toutes</a>
     <a href="{{ route('tasks.index', ['status' => 'todo']) }}" class="px-4 py-2 bg-white rounded-md text-sm border hover:bg-gray-50">À faire</a>
-    <a href="{{ route('tasks.index', ['status' => 'in progress']) }}" class="px-4 py-2 bg-white rounded-md text-sm border hover:bg-gray-50">En cours</a>
+    <a href="{{ route('tasks.index', ['status' => 'in_progress']) }}" class="px-4 py-2 bg-white rounded-md text-sm border hover:bg-gray-50">En cours</a>
     <a href="{{ route('tasks.index', ['status' => 'done']) }}" class="px-4 py-2 bg-white rounded-md text-sm border hover:bg-gray-50">Terminées</a>
 </div>
 
