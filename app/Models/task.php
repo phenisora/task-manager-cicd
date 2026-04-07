@@ -13,4 +13,8 @@ class task extends Model
         'priority',
         'due_date',
     ];
+
+    protected $casts = [
+        'due_date' => 'date',
+    ];
 }
