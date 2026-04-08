@@ -21,7 +21,7 @@ jobs:
     # Exécution en parallèle pour PHP 8.2 et 8.3
     strategy:
       matrix:
-        php-version: ['8.2']
+        php-version: ['8.4']
 
     # Service MySQL pour les tests (base "testing")
     services:
@@ -98,7 +98,7 @@ jobs:
       # Envoi du rapport de couverture à Codecov (une fois par matrix, ici PHP 8.2)
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
-        if: matrix.php-version == '8.2'
+        if: matrix.php-version == '8.4'
         with:
           files: coverage.xml
           fail_ci_if_error: false
