@@ -33,7 +33,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKER_USERNAME }}/todo-manager-app
+          images: ${{ secrets.DOCKER_USERNAME }}/task-manager-app
           tags: |
             type=ref,event=branch
             type=ref,event=tag
