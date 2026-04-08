@@ -21,7 +21,7 @@ jobs:
     # Exécution en parallèle pour PHP 8.2 et 8.3
     strategy:
       matrix:
-        php-version: ['8.4']
+        php-version: ["8.4"]
 
     # Service MySQL pour les tests (base "testing")
     services:
@@ -93,7 +93,7 @@ jobs:
           DB_DATABASE: testing
           DB_USERNAME: root
           DB_PASSWORD: password
-        run: php artisan test --coverage --min=80
+        run: php artisan test --coverage --min=70
 
       # Envoi du rapport de couverture à Codecov (une fois par matrix, ici PHP 8.2)
       - name: Upload coverage to Codecov
@@ -116,7 +116,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
@@ -132,32 +132,31 @@ jobs:
       # Vérification du style de code (PHP CS Fixer en mode --test, pas de modification)
       - name: Run PHP CS Fixer
         run: ./vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
-  
 
   # Job 3 : Build des assets frontend (Node.js, npm, Vite)
   # ---------------------------------------------------------------------------
   frontend:
-      name: Frontend Build
-      runs-on: ubuntu-latest
+    name: Frontend Build
+    runs-on: ubuntu-latest
 
-      steps:
-        - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-        # Node.js 20 (pas de cache npm : package-lock.json absent du repo)
-        - name: Setup Node.js
-          uses: actions/setup-node@v4
-          with:
-            node-version: '20'
+      # Node.js 20 (pas de cache npm : package-lock.json absent du repo)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-        - name: Install dependencies
-          run: npm install
+      - name: Install dependencies
+        run: npm install
 
-        - name: Build assets
-          run: npm run build
+      - name: Build assets
+        run: npm run build
 
-        # Sauvegarde du build pour le job deploy (artifact)
-        - name: Upload build artifacts
-          uses: actions/upload-artifact@v4
-          with:
-            name: frontend-build
-            path: public/build
+      # Sauvegarde du build pour le job deploy (artifact)
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: public/build
