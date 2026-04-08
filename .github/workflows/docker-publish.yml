@@ -42,12 +42,4 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha
 
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/todo-manager-app:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/todo-manager-app:buildcache,mode=max
+     
