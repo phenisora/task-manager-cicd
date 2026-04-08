@@ -3,7 +3,6 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\Task;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -50,11 +49,11 @@ class TaskControllerTest extends TestCase
     public function test_store_creates_task_and_redirects(): void
     {
         $response = $this->post(route('tasks.store'), [
-            'title'       => 'Nouvelle tâche',
+            'title' => 'Nouvelle tâche',
             'description' => 'Description',
-            'status'      => 'todo',
-            'priority'    => 'medium',
-            'due_date'    => null,
+            'status' => 'todo',
+            'priority' => 'medium',
+            'due_date' => null,
         ]);
 
         $response->assertRedirect(route('tasks.index'));
@@ -88,11 +87,11 @@ class TaskControllerTest extends TestCase
         $task = Task::create($this->taskData(['title' => 'Ancien titre']));
 
         $response = $this->put(route('tasks.update', $task->id), [
-            'title'       => 'Nouveau titre',
+            'title' => 'Nouveau titre',
             'description' => 'Nouvelle description',
-            'status'      => 'done',
-            'priority'    => 'high',
-            'due_date'    => null,
+            'status' => 'done',
+            'priority' => 'high',
+            'due_date' => null,
         ]);
 
         $response->assertRedirect(route('tasks.index'));
@@ -116,11 +115,11 @@ class TaskControllerTest extends TestCase
     private function taskData(array $overrides = []): array
     {
         return array_merge([
-            'title'       => 'Tâche test',
+            'title' => 'Tâche test',
             'description' => 'Description test',
-            'status'      => 'todo',
-            'priority'    => 'medium',
-            'due_date'    => null,
+            'status' => 'todo',
+            'priority' => 'medium',
+            'due_date' => null,
         ], $overrides);
     }
 }
