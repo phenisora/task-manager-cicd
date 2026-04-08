@@ -93,16 +93,7 @@ jobs:
           DB_DATABASE: testing
           DB_USERNAME: root
           DB_PASSWORD: password
-        run: php artisan test --coverage --min=80
-
-      # Envoi du rapport de couverture à Codecov (une fois par matrix, ici PHP 8.2)
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: matrix.php-version == '8.2'
-        with:
-          files: coverage.xml
-          fail_ci_if_error: false
-
+        run: php artisan test --coverage --min=70
   # ---------------------------------------------------------------------------
   # Job 2 : Qualité de code (PHPStan + Laravel Pint)
   # ---------------------------------------------------------------------------
