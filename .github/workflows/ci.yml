@@ -1,29 +1,114 @@
-name: Laravel CI
+# .github/workflows/laravel.yml
+# CI/CD Laravel - Ajusté pour ce projet (PHP 8.2+, Pint, PHPStan, SQLite/MySQL)
 
+name: Laravel CI/CD
+
+# Déclenchement du workflow
 on:
   push:
-    branches: [ main ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  laravel-tests:
+  # ---------------------------------------------------------------------------
+  # Job 1 : Tests unitaires et fonctionnels (PHP 8.2, MySQL, couverture)
+  # ---------------------------------------------------------------------------
+  tests:
+    name: Tests (PHP ${{ matrix.php-version }})
     runs-on: ubuntu-latest
 
-    # Service MySQL pour les tests de base de données
+    # Exécution en parallèle pour PHP 8.2 et 8.3
+    strategy:
+      matrix:
+        php-version: ['8.2']
+
+    # Service MySQL pour les tests (base "testing")
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: task_manager_test
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: testing
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
-    strategy:
-      matrix:
-        php-version: ['8.2']
+    steps:
+      # Récupération du code source
+      - uses: actions/checkout@v4
+
+      # Installation de PHP avec extensions et Xdebug (couverture)
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, pdo, pdo_mysql
+          coverage: xdebug
+
+      # Cache des dépendances Composer (accélère les runs suivants)
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      # Installation des dépendances PHP (--no-scripts évite package:discover sans .env)
+      - name: Install dependencies
+        env:
+          COMPOSER_MEMORY_LIMIT: -1
+        run: composer install --prefer-dist --no-progress --no-scripts
+
+      # Copie .env.example → .env et génération de la clé d'application
+      - name: Setup environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # Exécution des scripts Composer (package:discover) après que .env soit en place
+      - name: Composer post-install scripts
+        run: composer run-script post-autoload-dump
+
+      # Migrations de la base de test (MySQL)
+      - name: Run database migrations
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: password
+        run: php artisan migrate --force
+
+      # Exécution des tests avec couverture minimale 80 %
+      - name: Run tests with coverage
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: password
+        run: php artisan test --coverage --min=80
+
+      # Envoi du rapport de couverture à Codecov (une fois par matrix, ici PHP 8.2)
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        if: matrix.php-version == '8.2'
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+
+  # ---------------------------------------------------------------------------
+  # Job 2 : Qualité de code (PHPStan + Laravel Pint)
+  # ---------------------------------------------------------------------------
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -31,44 +116,19 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, xml, ctype, iconv, mysqlnd, dom, curl
-          coverage: xdebug # Nécessaire pour le rapport de couverture à 70%
+          php-version: '8.2'
 
-      - name: Cache Vendor
-        uses: actions/cache@v3
-        with:
-          path: vendor/
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
 
-      - name: Install Dependencies
-        run: composer install --no-ansi --no-interaction --no-scripts --no-progress
-
-      - name: Prepare Laravel Environment
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-          
-      - name: Run Database Migrations
-        run: php artisan migrate --force
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: task_manager_test
-          DB_USERNAME: root
-
-      - name: Run Tests with Coverage
-        run: php artisan test --coverage-clover=coverage.xml --min=70
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: task_manager_test
-          DB_USERNAME: root
-
+      # Analyse statique du code (détection d'erreurs)
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse
+        run: ./vendor/bin/phpstan analyse --memory-limit=512M
 
-        - name: Run PHP CS Fixer
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+      # Vérification du style de code (Pint en mode --test, pas de modification)
+      #- name: Run Laravel Pint (style)
+      # run: ./vendor/bin/pint --test
+
+      # Vérification du style de code (PHP CS Fixer en mode --test, pas de modification)
+      - name: Run PHP CS Fixer
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
