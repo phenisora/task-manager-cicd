@@ -120,6 +120,8 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
+      - name: Generate app key
+        run: php artisan key:generate --env=testing
 
       # Analyse statique du code (détection d'erreurs)
       - name: Run PHPStan
