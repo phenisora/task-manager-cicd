@@ -9,11 +9,13 @@ class TaskController extends Controller
 {
     public function __construct(
         protected TodoService $service
-    ) {}
+    ) {
+    }
 
     public function index(Request $request)
     {
         $tasks = $this->service->listTasks($request->status);
+
         return view('tasks.index', compact('tasks'));
     }
 
@@ -22,7 +24,7 @@ class TaskController extends Controller
         return view('tasks.create');
     }
 
-    public function store(Request $request) 
+    public function store(Request $request)
     {
         $data = $request->validate([
             'title' => 'required|max:255',
@@ -31,30 +33,32 @@ class TaskController extends Controller
         ]);
 
         $this->service->createTask($data);
+
         return redirect()->route('tasks.index');
     }
     public function edit(int $id)
-        {
-            // On passe par le service pour récupérer la tâche
-            $task = $this->service->getTaskById($id); 
-            return view('tasks.edit', compact('task'));
-        }
+    {
+        // On passe par le service pour récupérer la tâche
+        $task = $this->service->getTaskById($id);
+
+        return view('tasks.edit', compact('task'));
+    }
 
 
     public function update(Request $request, int $id)
     {
-    $data = $request->validate([
-        'title' => 'required|max:255',
-        'description' => 'nullable',
-        'status' => 'required|in:todo,in_progress,done',
-        'priority' => 'required|in:low,medium,high',
-        'due_date' => 'nullable|date',
-    ]);
+        $data = $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'nullable',
+            'status' => 'required|in:todo,in_progress,done',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
 
-    $this->service->updateTask($id, $data);
+        $this->service->updateTask($id, $data);
 
-    return redirect()->route('tasks.index')
-        ->with('success', 'La tâche a été mise à jour avec succès.');
+        return redirect()->route('tasks.index')
+            ->with('success', 'La tâche a été mise à jour avec succès.');
     }
 
 

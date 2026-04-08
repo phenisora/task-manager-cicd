@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\Task;
@@ -7,7 +8,7 @@ class TodoRepository
 {
     public function getAll(?string $status = null)
     {
-        return Task::when($status, fn($q) => $q->where('status', $status))
+        return Task::when($status, fn ($q) => $q->where('status', $status))
             ->latest()
             ->get();
     }
