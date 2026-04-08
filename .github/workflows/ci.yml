@@ -2,9 +2,9 @@ name: Laravel CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   laravel-tests:
@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ['8.2']
+        php-version: ["8.2"]
 
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +48,7 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          
+
       - name: Run Database Migrations
         run: php artisan migrate --force
         env:
