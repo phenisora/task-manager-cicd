@@ -1,58 +1,171 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## 📋 Description du projet
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Task Manager** est une application web de gestion de tâches développée avec **Laravel **.
+Ce projet a été réalisé dans le cadre d'une formation  academique  pour mettre en place une infrastructure CI/CD complète de A à Z.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Fonctionnalités
+- ➕ Créer une tâche (titre, description, statut, priorité, date limite)
+- ✏️ Modifier une tâche existante
+- 🗑️ Supprimer une tâche
+- 📋 Lister toutes les tâches avec filtres (statut, priorité)
+- 👁️ Voir le détail d'une tâche
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🛠️ Prérequis
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Outil | Version minimale |
+|-------|-----------------|
+| PHP | 8.2+ |
+| Composer | 2.x |
+| Node.js | 20.x |
+| Docker | 24.x |
+| Docker Compose | v2 |
+| Git | 2.x |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🚀 Installation locale (sans Docker)
 
 ```bash
-composer require laravel/boost --dev
+# 1. Cloner le projet
+git clone https://github.com/phenisora/task-manager-cicd.git
 
-php artisan boost:install
+# 2. Installer les dépendances PHP
+composer install
+
+# 3. Installer les dépendances JavaScript
+npm install
+
+# 4. Copier la configuration
+cp .env.example .env
+
+# 5. Générer la clé d'application
+php artisan key:generate
+
+# 6. Configurer votre .env (base de données, etc.)
+# Modifier DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+
+# 7. Lancer les migrations
+php artisan migrate
+
+# 8. Compiler les assets
+npm run build
+
+# 9. Démarrer le serveur
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+L'application est accessible sur : **http://localhost:8000**
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🐳 Installation avec Docker (recommandé)
 
-## Code of Conduct
+```bash
+# 1. Cloner le projet
+git clone https://github.com/phenisora/task-manager-cicd.git
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 2. Copier la configuration
+cp .env.example .env
 
-## Security Vulnerabilities
+# 3. Démarrer tous les services
+docker compose up -d --build
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 4. Générer la clé d'application
+docker compose exec app php artisan key:generate
 
-## License
+# 5. Lancer les migrations
+docker compose exec app php artisan migrate
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Services Docker disponibles
+| Service | URL/Port |
+|---------|----------|
+| Application | http://localhost:8080 |
+| MySQL | localhost:3306 |
+| Redis | localhost:6379 |
+
+---
+
+## 🧪 Commandes utiles
+
+```bash
+# Lancer tous les tests
+php artisan test
+
+# Lancer les tests avec couverture de code (min 70%)
+php artisan test --coverage --min=70
+
+# Analyse statique PHPStan
+vendor/bin/phpstan analyse
+
+# Vérification du style de code
+vendor/bin/php-cs-fixer fix --dry-run --diff
+
+# Corriger automatiquement le style
+vendor/bin/php-cs-fixer fix
+
+# Avec Docker
+docker compose exec app php artisan test
+docker compose exec app vendor/bin/phpstan analyse
+```
+
+---
+
+## 🔄 Pipeline CI/CD
+
+La pipeline se déclenche automatiquement sur chaque **push** et **Pull Request** vers `main`.
+
+```
+Push/PR vers main
+       │
+       ▼
+┌─────────────────────────────────────────┐
+│              GitHub Actions             │
+├──────────┬──────────┬───────┬──────────┤
+│  Tests   │ PHPStan  │  CS   │ Frontend │
+│  + MySQL │  Niveau5 │ Fixer │  Build   │
+│  + 70%   │          │       │          │
+│ coverage │          │       │          │
+└──────────┴──────────┴───────┴──────────┘
+       │ (si tous les jobs passent)
+       ▼
+┌─────────────────────────────────────────┐
+│         Docker Build & Push             │
+│         → ghcr.io (GHCR)               │
+│         Tags: latest, sha, version      │
+└─────────────────────────────────────────┘
+```
+
+### Jobs de la pipeline
+
+| Job | Description |
+|-----|-------------|
+| `tests` | Exécute les tests PHPUnit avec MySQL + coverage 70% |
+| `phpstan` | Analyse statique du code (niveau 5) |
+| `code-style` | Vérifie le style avec PHP CS Fixer |
+| `frontend` | Build des assets Vite + upload artifact |
+
+---
+
+## 🌿 Workflow Git (GitHub Flow)
+
+```
+main ──────────────────────────────────────────→
+  │                           ↑
+  └──→ feat/task-model ───────┘ (Pull Request)
+  └──→ feat/task-crud  ───────┘ (Pull Request)
+  └──→ test/unit-tests ───────┘ (Pull Request)
+```
+
+
+
+---
+
+## 👥 Équipe
+
+Projet réalisé par le groupe dans le cadre de la formation **Laravel/PHP - DevOps**  
+Enseignant : **Serigne Diagne**
