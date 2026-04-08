@@ -5,7 +5,7 @@ use App\Models\Task;
 
 class TodoRepository
 {
-    public function getAll(string $status = null)
+    public function getAll(?string $status = null)
     {
         return Task::when($status, fn($q) => $q->where('status', $status))
             ->latest()
